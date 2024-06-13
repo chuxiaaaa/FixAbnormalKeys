@@ -13,6 +13,17 @@ namespace FixAbnormalKeys
         public Form1()
         {
             InitializeComponent();
+            textBox1.TextAlign = HorizontalAlignment.Center;
+        }
+
+        private void textBox1_KeyDown(object sender, KeyEventArgs e)
+        {
+            textBox1.Text = e.KeyData.ToString();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 }
