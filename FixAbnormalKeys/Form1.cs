@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
@@ -15,6 +16,8 @@ namespace FixAbnormalKeys
         public Dictionary<Keys, List<DateTime>> KeyDownTimes = new Dictionary<Keys, List<DateTime>>();
 
         public int handleCount;
+
+        public string savePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\FixAbnormalKeys\\keys.txt";
 
         public Hook hook;
 
@@ -50,11 +53,19 @@ namespace FixAbnormalKeys
 
         private void button4_Click(object sender, EventArgs e)
         {
-            if(string.IsNullOrWhiteSpace(textBox1.Text) || string.IsNullOrWhiteSpace(textBox2.Text))
+            if (string.IsNullOrWhiteSpace(textBox1.Text) || string.IsNullOrWhiteSpace(textBox2.Text))
             {
                 return;
             }
             listBox1.Items.Add(textBox1.Text + "," + textBox2.Text);
+            FileInfo fileInfo = new FileInfo(savePath);
+            if (!fileInfo.Directory.Exists)
+            {
+                fileInfo.Directory.Create();
+            }
+            string[] lines = new string[listBox1.Items.Count];
+            listBox1.Items.CopyTo(lines, 0);
+            File.WriteAllLines(savePath, lines);
         }
 
         private void Form1_MouseDown(object sender, MouseEventArgs e)
@@ -88,6 +99,20 @@ namespace FixAbnormalKeys
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            if (File.Exists(savePath))
+            {
+                foreach (var item in File.ReadAllLines(savePath))
+                {
+                    if (item.Contains(",") && item.Split(',').Length == 2)
+                    {
+                        var arr = item.Split(',');
+                        if (Enum.TryParse<Keys>(arr[0], out _) && Enum.TryParse<Keys>(arr[1], out _))
+                        {
+                            listBox1.Items.Add(item);
+                        }
+                    }
+                }
+            }
             hook = new Hook();
             hook.KeyDown += KeyEvent;
             hook.KeyUp += KeyEvent;
@@ -103,14 +128,14 @@ namespace FixAbnormalKeys
                 var arr = data.Split(',');
                 var key1 = (Keys)Enum.Parse(typeof(Keys), arr[0]);
                 var key2 = (Keys)Enum.Parse(typeof(Keys), arr[1]);
-                if(e.KeyCode == key2)
+                if (e.KeyCode == key2)
                 {
                     if (KeyDownState.TryGetValue(key1, out var down) && down)
                     {
                         UpdateHandleCount();
                         return true;
                     }
-                    if(KeyDownTimes.TryGetValue(key1,out var times))
+                    if (KeyDownTimes.TryGetValue(key1, out var times))
                     {
                         foreach (var item2 in times)
                         {
@@ -122,7 +147,7 @@ namespace FixAbnormalKeys
                         }
                     }
                 }
-                if(e.KeyCode == key1)
+                if (e.KeyCode == key1)
                 {
                     if (!KeyDownState.ContainsKey(key1))
                     {
