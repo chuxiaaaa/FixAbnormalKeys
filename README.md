@@ -1,5 +1,7 @@
 # Fix Abnormal Keys(修复按键异常)
 
+![51fd30332d221dd32ab6283f54a59811](https://github.com/chuxiaaaa/FixAbnormalKeys/assets/62934376/ce59158f-42af-40f0-bd88-63d1ce974762)
+
 ## 中文
 
 该软件用于处理你的键盘按键出现异常时，并且你不想维修你的键盘(没有备用键盘/维修需要时间)的情况下
